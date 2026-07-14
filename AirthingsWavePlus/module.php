@@ -41,10 +41,11 @@ class AirthingsWavePlus extends IPSModuleStrict
     {
         // Temperatur
         if (@IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirTemp'), [
+            $ok = IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirTemp'), [
                 'SUFFIX'       => ' °C',
                 'ICON'         => 'Temperature'
             ]);
+            IPS_LogMessage('AirthingsWavePlus', 'UpdatePresentations AirTemp: ' . ($ok ? 'OK' : 'FAIL'));
         }
         
         // Luftfeuchtigkeit
