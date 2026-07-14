@@ -41,7 +41,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Temperatur
         if (@IPS_VariableExists($this->GetIDForIdent('Temperature'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('Temperature'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' °C',
                 'ICON'         => 'Temperature'
             ]);
@@ -50,7 +50,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Luftfeuchtigkeit
         if (@IPS_VariableExists($this->GetIDForIdent('Humidity'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('Humidity'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' %',
                 'ICON'         => 'Drops'
             ]);
@@ -59,7 +59,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Luftdruck
         if (@IPS_VariableExists($this->GetIDForIdent('Pressure'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('Pressure'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' hPa',
                 'ICON'         => 'Gauge'
             ]);
@@ -68,7 +68,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Batterie
         if (@IPS_VariableExists($this->GetIDForIdent('Battery'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('Battery'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' V', // ESPHome gives voltage by default
                 'ICON'         => 'Battery'
             ]);
@@ -77,7 +77,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // CO2
         if (@IPS_VariableExists($this->GetIDForIdent('CO2'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('CO2'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' ppm',
                 'ICON'         => 'Wind'
             ]);
@@ -86,7 +86,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // VOC
         if (@IPS_VariableExists($this->GetIDForIdent('VOC'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('VOC'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' ppb',
                 'ICON'         => 'Wind'
             ]);
@@ -95,14 +95,14 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Radon ST / LT
         if (@IPS_VariableExists($this->GetIDForIdent('RadonST'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('RadonST'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' Bq/m³',
                 'ICON'         => 'Radiation'
             ]);
         }
         if (@IPS_VariableExists($this->GetIDForIdent('RadonLT'))) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('RadonLT'), [
-                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'PRESENTATION' => 1,
                 'SUFFIX'       => ' Bq/m³',
                 'ICON'         => 'Radiation'
             ]);
