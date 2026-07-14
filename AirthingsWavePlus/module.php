@@ -151,4 +151,27 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         return "OK";
     }
+
+    public function RequestUpdate(): void
+    {
+        if (!$this->HasActiveParent()) {
+            echo "Kein aktiver MQTT Server verbunden!";
+            return;
+        }
+
+        $base = $this->ReadPropertyString('MQTTBaseTopic');
+        $topic = $base . '/update/command';
+
+        $data = [
+            'DataID' => '{043EA491-0325-4ADD-8FC2-A30C8EEB4D3F}',
+            'PacketType' => 3,
+            'QualityOfService' => 0,
+            'Retain' => false,
+            'Topic' => $topic,
+            'Payload' => 'PRESS'
+        ];
+
+        $this->SendDataToParent(json_encode($data));
+        echo "Update-Anfrage an ESPHome gesendet ($topic)!";
+    }
 }

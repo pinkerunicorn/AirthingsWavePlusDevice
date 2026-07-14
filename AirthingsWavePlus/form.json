@@ -1,0 +1,16 @@
+{
+    "elements": [
+        {
+            "type": "ValidationTextBox",
+            "name": "MQTTBaseTopic",
+            "caption": "MQTT Base Topic (z.B. airthings-gateway)"
+        }
+    ],
+    "actions": [
+        {
+            "type": "Button",
+            "caption": "Manuelles Update anfragen",
+            "onClick": "AIRTHINGS_RequestUpdate($id);"
+        }
+    ]
+}
