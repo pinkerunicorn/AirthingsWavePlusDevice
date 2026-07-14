@@ -110,46 +110,52 @@ class AirthingsWavePlus extends IPSModuleStrict
         }
     }
 
-    public function ReceiveData($JSONString): string
+    public function ReceiveData(string $JSONString): string
     {
-        $data = json_decode($JSONString);
-        
-        // Standard MQTT Splitter payload structure in IP-Symcon
-        if (!isset($data->Topic) || !isset($data->Payload)) {
+        try {
+            $data = json_decode($JSONString);
+            
+            // Standard MQTT Splitter payload structure in IP-Symcon
+            if (!isset($data->Topic) || !isset($data->Payload)) {
+                return "NOK";
+            }
+
+            $topic = $data->Topic;
+            $payload = $data->Payload;
+            $base = $this->ReadPropertyString('MQTTBaseTopic');
+
+            IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payload);
+
+            // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
+            if (strpos($topic, $base) !== false) {
+                $value = floatval($payload);
+                
+                // Map ESPHome default topic names to variables
+                // Use @IPS_GetObjectIDByIdent instead of GetIDForIdent to avoid Exceptions in Strict Mode
+                if (strpos($topic, 'temperature') !== false && @IPS_GetObjectIDByIdent('Temperature', $this->InstanceID) !== false) {
+                    $this->SetValue('Temperature', $value);
+                } elseif (strpos($topic, 'humidity') !== false && @IPS_GetObjectIDByIdent('Humidity', $this->InstanceID) !== false) {
+                    $this->SetValue('Humidity', $value);
+                } elseif (strpos($topic, 'pressure') !== false && @IPS_GetObjectIDByIdent('Pressure', $this->InstanceID) !== false) {
+                    $this->SetValue('Pressure', $value);
+                } elseif (strpos($topic, 'battery') !== false && @IPS_GetObjectIDByIdent('Battery', $this->InstanceID) !== false) {
+                    $this->SetValue('Battery', $value);
+                } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('CO2', $this->InstanceID) !== false) {
+                    $this->SetValue('CO2', (int)$value);
+                } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @IPS_GetObjectIDByIdent('VOC', $this->InstanceID) !== false) {
+                    $this->SetValue('VOC', (int)$value);
+                } elseif (strpos($topic, 'radon_long_term') !== false && @IPS_GetObjectIDByIdent('RadonLT', $this->InstanceID) !== false) {
+                    $this->SetValue('RadonLT', (int)$value);
+                } elseif (strpos($topic, 'radon') !== false && @IPS_GetObjectIDByIdent('RadonST', $this->InstanceID) !== false) {
+                    $this->SetValue('RadonST', (int)$value);
+                }
+            }
+
+            return "OK";
+        } catch (Throwable $e) {
+            IPS_LogMessage('AirthingsWavePlus', 'ReceiveData Exception: ' . $e->getMessage());
             return "NOK";
         }
-
-        $topic = $data->Topic;
-        $payload = $data->Payload;
-        $base = $this->ReadPropertyString('MQTTBaseTopic');
-
-        IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payload);
-
-        // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
-        if (strpos($topic, $base) !== false) {
-            $value = floatval($payload);
-            
-            // Map ESPHome default topic names to variables
-            if (strpos($topic, 'temperature') !== false && @$this->GetIDForIdent('Temperature') !== false) {
-                $this->SetValue('Temperature', $value);
-            } elseif (strpos($topic, 'humidity') !== false && @$this->GetIDForIdent('Humidity') !== false) {
-                $this->SetValue('Humidity', $value);
-            } elseif (strpos($topic, 'pressure') !== false && @$this->GetIDForIdent('Pressure') !== false) {
-                $this->SetValue('Pressure', $value);
-            } elseif (strpos($topic, 'battery') !== false && @$this->GetIDForIdent('Battery') !== false) {
-                $this->SetValue('Battery', $value);
-            } elseif (strpos($topic, 'co2') !== false && @$this->GetIDForIdent('CO2') !== false) {
-                $this->SetValue('CO2', (int)$value);
-            } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @$this->GetIDForIdent('VOC') !== false) {
-                $this->SetValue('VOC', (int)$value);
-            } elseif (strpos($topic, 'radon_long_term') !== false && @$this->GetIDForIdent('RadonLT') !== false) {
-                $this->SetValue('RadonLT', (int)$value);
-            } elseif (strpos($topic, 'radon') !== false && @$this->GetIDForIdent('RadonST') !== false) {
-                $this->SetValue('RadonST', (int)$value);
-            }
-        }
-
-        return "OK";
     }
 
     public function RequestUpdate(): void
