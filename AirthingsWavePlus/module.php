@@ -114,13 +114,15 @@ class AirthingsWavePlus extends IPSModuleStrict
         $data = json_decode($JSONString);
         
         // Standard MQTT Splitter payload structure in IP-Symcon
-        if (!isset($data->DataID) || !isset($data->Topic) || !isset($data->Payload)) {
+        if (!isset($data->Topic) || !isset($data->Payload)) {
             return "NOK";
         }
 
         $topic = $data->Topic;
         $payload = $data->Payload;
         $base = $this->ReadPropertyString('MQTTBaseTopic');
+
+        IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payload);
 
         // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
         if (strpos($topic, $base) !== false) {
