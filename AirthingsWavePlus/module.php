@@ -9,9 +9,6 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Never delete this line!
         parent::Create();
 
-        // Connect to MQTT Splitter (Optional/Manual for now, can be configured by user)
-        $this->ConnectParent('{C6D2AEB3-6E1F-4B2E-8E69-3A1A00246850}'); // MQTT Client / Server Splitter GUIDs vary, user will select
-
         // Properties for MQTT
         $this->RegisterPropertyString('MQTTBaseTopic', 'airthings01');
 
