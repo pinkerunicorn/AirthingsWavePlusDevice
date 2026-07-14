@@ -113,14 +113,18 @@ class AirthingsWavePlus extends IPSModuleStrict
             }
 
             $topic = $data->Topic;
-            $payload = $data->Payload;
+            
+            // IP-Symcon MQTT Splitter passes Payload as HEX string
+            $payloadRaw = is_scalar($data->Payload) ? (string)$data->Payload : '';
+            $payloadStr = (ctype_xdigit($payloadRaw) && !empty($payloadRaw)) ? hex2bin($payloadRaw) : $payloadRaw;
+            
             $base = $this->ReadPropertyString('MQTTBaseTopic');
 
-            IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payload);
+            IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payloadStr);
 
             // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
             if (strpos($topic, $base) !== false) {
-                $value = floatval($payload);
+                $value = floatval($payloadStr);
                 
                 // Map ESPHome default topic names to variables
                 // Use @IPS_GetObjectIDByIdent instead of GetIDForIdent to avoid Exceptions in Strict Mode
