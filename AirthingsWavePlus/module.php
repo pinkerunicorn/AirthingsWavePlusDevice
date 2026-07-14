@@ -16,6 +16,7 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         // Variables
         $this->RegisterVariableBoolean('Online', 'Online');
+        $this->RegisterVariableBoolean('Alarm', 'Alarm');
         $this->RegisterVariableFloat('AirTemp', 'Temperatur');
         $this->RegisterVariableFloat('AirHum', 'Luftfeuchtigkeit');
         $this->RegisterVariableFloat('AirPress', 'Luftdruck');
@@ -50,6 +51,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         // Timer fired -> no data received for 'Timeout' minutes
         $this->SetTimerInterval('WatchdogTimer', 0); // Stop timer until new data arrives
         $this->SetValue('Online', false);
+        $this->SetValue('Alarm', true);
         IPS_LogMessage('AirthingsWavePlus', 'Watchdog ausgelöst: Keine Daten seit ' . $this->ReadPropertyInteger('Timeout') . ' Minuten empfangen!');
     }
     
@@ -70,6 +72,14 @@ class AirthingsWavePlus extends IPSModuleStrict
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('Online'), [
                 'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
                 'ICON'         => 'Network'
+            ]);
+        }
+        
+        // Alarm Status
+        if (@IPS_GetObjectIDByIdent('Alarm', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Alarm'), [
+                'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+                'ICON'         => 'Alert'
             ]);
         }
 
@@ -167,8 +177,10 @@ class AirthingsWavePlus extends IPSModuleStrict
                 $isOnline = (strtolower($payloadStr) === 'online');
                 $this->SetValue('Online', $isOnline);
                 if ($isOnline) {
+                    $this->SetValue('Alarm', false);
                     $this->ResetWatchdog();
                 } else {
+                    $this->SetValue('Alarm', true);
                     $this->SetTimerInterval('WatchdogTimer', 0);
                 }
                 return "OK";
@@ -213,6 +225,7 @@ class AirthingsWavePlus extends IPSModuleStrict
                 // Reset Watchdog on any sensor update
                 if ($updated) {
                     $this->SetValue('Online', true);
+                    $this->SetValue('Alarm', false);
                     $this->ResetWatchdog();
                 }
             }
