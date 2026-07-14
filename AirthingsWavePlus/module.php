@@ -39,6 +39,13 @@ class AirthingsWavePlus extends IPSModuleStrict
 
     private function UpdatePresentations(): void
     {
+        // Dump Presentation Constants to Log for discovery
+        foreach (get_defined_constants() as $key => $val) {
+            if (strpos($key, 'VARIABLE_PRESENTATION_') === 0) {
+                IPS_LogMessage('AirthingsWavePlus_DEBUG', $key . ' => ' . $val);
+            }
+        }
+
         // Temperatur
         if (@IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
             $ok = IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirTemp'), [
