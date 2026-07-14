@@ -6,9 +6,7 @@
     "author": "Florian Graßinger",
     "aliases": ["Wave Plus"],
     "parentRequirements": [
-        "{F7A0DD2E-7684-95C0-A6CA-47B32111578D}",
-        "{CE73CE60-03F1-4275-BB22-B1F64AA16E86}",
-        "{018EF6B5-AB94-40C6-AA53-46943E824ACF}"
+        "{EE0D345A-CF31-428A-A613-33CE98E752DD}"
     ],
     "childRequirements": [],
     "implemented": [
