@@ -13,14 +13,14 @@ class AirthingsWavePlus extends IPSModuleStrict
         $this->RegisterPropertyString('MQTTBaseTopic', 'airthings01');
 
         // Variables
-        $this->RegisterVariableFloat('Temperature', 'Temperatur', '', 10);
-        $this->RegisterVariableFloat('Humidity', 'Luftfeuchtigkeit', '', 20);
-        $this->RegisterVariableFloat('Pressure', 'Luftdruck', '', 30);
-        $this->RegisterVariableFloat('Battery', 'Batterie', '', 35);
-        $this->RegisterVariableInteger('CO2', 'CO2', '', 40);
-        $this->RegisterVariableInteger('VOC', 'VOC', '', 50);
-        $this->RegisterVariableInteger('RadonST', 'Radon (Short Term)', '', 60);
-        $this->RegisterVariableInteger('RadonLT', 'Radon (Long Term)', '', 70);
+        $this->RegisterVariableFloat('Temperature', 'Temperatur');
+        $this->RegisterVariableFloat('Humidity', 'Luftfeuchtigkeit');
+        $this->RegisterVariableFloat('Pressure', 'Luftdruck');
+        $this->RegisterVariableFloat('Battery', 'Batterie');
+        $this->RegisterVariableInteger('CO2', 'CO2');
+        $this->RegisterVariableInteger('VOC', 'VOC');
+        $this->RegisterVariableInteger('RadonST', 'Radon (Short Term)');
+        $this->RegisterVariableInteger('RadonLT', 'Radon (Long Term)');
     }
 
     public function ApplyChanges(): void
