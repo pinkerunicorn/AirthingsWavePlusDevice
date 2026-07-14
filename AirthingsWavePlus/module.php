@@ -162,10 +162,14 @@ class AirthingsWavePlus extends IPSModuleStrict
             // Standard MQTT Splitter payload structure in IP-Symcon
             if (!isset($data->Topic) || !isset($data->Payload)) {
                 return "NOK";
-            }
-
             $topic = $data->Topic;
-            $payloadStr = is_scalar($data->Payload) ? (string)$data->Payload : '';
+            
+            // IP-Symcon MQTT Splitter always passes Payload as a hex string
+            $payloadRaw = is_scalar($data->Payload) ? (string)$data->Payload : '';
+            $payloadStr = $payloadRaw;
+            if (ctype_xdigit($payloadRaw) && strlen($payloadRaw) % 2 === 0) {
+                $payloadStr = hex2bin($payloadRaw);
+            }
             
             $base = $this->ReadPropertyString('MQTTBaseTopic');
 
