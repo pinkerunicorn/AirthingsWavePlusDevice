@@ -23,6 +23,14 @@ class AirthingsWavePlus extends IPSModuleStrict
         $this->RegisterVariableInteger('RadonLT', 'Radon (Long Term)', '', 70);
     }
 
+    public function GetCompatibleParents(): array
+    {
+        return [
+            '{C6D2AEB3-6E1F-4B2E-8E69-3A1A00246850}', // MQTT Client
+            '{FD151B06-D5A7-4EE2-88E4-177D7DEBA98B}'  // MQTT Server
+        ];
+    }
+
     public function ApplyChanges(): void
     {
         // Never delete this line!
