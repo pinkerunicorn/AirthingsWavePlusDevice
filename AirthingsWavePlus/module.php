@@ -110,11 +110,11 @@ class AirthingsWavePlus extends IPSModuleStrict
             ]);
         }
 
-        // Batterie
+        // Batterie (wird als % dargestellt)
         if (@IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirBatt'), [
                 'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
-                'SUFFIX'       => ' V', // ESPHome gives voltage by default
+                'SUFFIX'       => ' %', 
                 'ICON'         => 'Battery'
             ]);
         }
@@ -203,7 +203,11 @@ class AirthingsWavePlus extends IPSModuleStrict
                     $this->SetValue('AirPress', $value);
                     $updated = true;
                 } elseif (strpos($topic, 'batt') !== false && @IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
-                    $this->SetValue('AirBatt', $value);
+                    // ESPHome liefert Spannung (z.B. 3.3V). Airthings verwendet 2x AA Batterien.
+                    // Voll = 3.3V (100%), Leer = ~2.2V (0%)
+                    $pct = (($value - 2.2) / (3.3 - 2.2)) * 100;
+                    $pct = max(0, min(100, $pct)); // Clamp between 0 and 100
+                    $this->SetValue('AirBatt', round($pct));
                     $updated = true;
                 } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('AirCO2', $this->InstanceID) !== false) {
                     $this->SetValue('AirCO2', (int)$value);
