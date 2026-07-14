@@ -124,22 +124,25 @@ class AirthingsWavePlus extends IPSModuleStrict
                 
                 // Map ESPHome default topic names to variables
                 // Use @IPS_GetObjectIDByIdent instead of GetIDForIdent to avoid Exceptions in Strict Mode
-                if (strpos($topic, 'temperature') !== false && @IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
+                if (strpos($topic, 'temp') !== false && @IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
                     $this->SetValue('AirTemp', $value);
-                } elseif (strpos($topic, 'humidity') !== false && @IPS_GetObjectIDByIdent('AirHum', $this->InstanceID) !== false) {
+                } elseif (strpos($topic, 'hum') !== false && @IPS_GetObjectIDByIdent('AirHum', $this->InstanceID) !== false) {
                     $this->SetValue('AirHum', $value);
-                } elseif (strpos($topic, 'pressure') !== false && @IPS_GetObjectIDByIdent('AirPress', $this->InstanceID) !== false) {
+                } elseif (strpos($topic, 'press') !== false && @IPS_GetObjectIDByIdent('AirPress', $this->InstanceID) !== false) {
                     $this->SetValue('AirPress', $value);
-                } elseif (strpos($topic, 'battery') !== false && @IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
+                } elseif (strpos($topic, 'batt') !== false && @IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
                     $this->SetValue('AirBatt', $value);
                 } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('AirCO2', $this->InstanceID) !== false) {
                     $this->SetValue('AirCO2', (int)$value);
                 } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @IPS_GetObjectIDByIdent('AirVOC', $this->InstanceID) !== false) {
                     $this->SetValue('AirVOC', (int)$value);
-                } elseif (strpos($topic, 'radon_long_term') !== false && @IPS_GetObjectIDByIdent('AirRadonLT', $this->InstanceID) !== false) {
+                } elseif ((strpos($topic, 'radon_long_term') !== false || strpos($topic, 'radon_lt') !== false) && @IPS_GetObjectIDByIdent('AirRadonLT', $this->InstanceID) !== false) {
                     $this->SetValue('AirRadonLT', (int)$value);
                 } elseif (strpos($topic, 'radon') !== false && @IPS_GetObjectIDByIdent('AirRadonST', $this->InstanceID) !== false) {
-                    $this->SetValue('AirRadonST', (int)$value);
+                    // Check if it's not the long term to avoid double matching
+                    if (strpos($topic, 'long') === false && strpos($topic, 'lt') === false) {
+                        $this->SetValue('AirRadonST', (int)$value);
+                    }
                 }
             }
 
