@@ -14,14 +14,14 @@ class AirthingsWavePlus extends IPSModuleStrict
         $this->SetReceiveDataFilter('.*' . preg_quote($this->ReadPropertyString('MQTTBaseTopic')) . '.*');
 
         // Variables
-        $this->RegisterVariableFloat('Temperature', 'Temperatur');
-        $this->RegisterVariableFloat('Humidity', 'Luftfeuchtigkeit');
-        $this->RegisterVariableFloat('Pressure', 'Luftdruck');
-        $this->RegisterVariableFloat('Battery', 'Batterie');
-        $this->RegisterVariableInteger('CO2', 'CO2');
-        $this->RegisterVariableInteger('VOC', 'VOC');
-        $this->RegisterVariableInteger('RadonST', 'Radon (Short Term)');
-        $this->RegisterVariableInteger('RadonLT', 'Radon (Long Term)');
+        $this->RegisterVariableFloat('AirTemp', 'Temperatur');
+        $this->RegisterVariableFloat('AirHum', 'Luftfeuchtigkeit');
+        $this->RegisterVariableFloat('AirPress', 'Luftdruck');
+        $this->RegisterVariableFloat('AirBatt', 'Batterie');
+        $this->RegisterVariableInteger('AirCO2', 'CO2');
+        $this->RegisterVariableInteger('AirVOC', 'VOC');
+        $this->RegisterVariableInteger('AirRadonST', 'Radon (Short Term)');
+        $this->RegisterVariableInteger('AirRadonLT', 'Radon (Long Term)');
     }
 
     public function ApplyChanges(): void
@@ -40,70 +40,62 @@ class AirthingsWavePlus extends IPSModuleStrict
     private function UpdatePresentations(): void
     {
         // Temperatur
-        if (@IPS_VariableExists($this->GetIDForIdent('Temperature'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Temperature'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirTemp'), [
                 'SUFFIX'       => ' °C',
                 'ICON'         => 'Temperature'
             ]);
         }
         
         // Luftfeuchtigkeit
-        if (@IPS_VariableExists($this->GetIDForIdent('Humidity'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Humidity'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirHum', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirHum'), [
                 'SUFFIX'       => ' %',
                 'ICON'         => 'Drops'
             ]);
         }
         
         // Luftdruck
-        if (@IPS_VariableExists($this->GetIDForIdent('Pressure'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Pressure'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirPress', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirPress'), [
                 'SUFFIX'       => ' hPa',
                 'ICON'         => 'Gauge'
             ]);
         }
 
         // Batterie
-        if (@IPS_VariableExists($this->GetIDForIdent('Battery'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Battery'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirBatt'), [
                 'SUFFIX'       => ' V', // ESPHome gives voltage by default
                 'ICON'         => 'Battery'
             ]);
         }
 
         // CO2
-        if (@IPS_VariableExists($this->GetIDForIdent('CO2'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('CO2'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirCO2', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirCO2'), [
                 'SUFFIX'       => ' ppm',
                 'ICON'         => 'Wind'
             ]);
         }
 
         // VOC
-        if (@IPS_VariableExists($this->GetIDForIdent('VOC'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('VOC'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirVOC', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirVOC'), [
                 'SUFFIX'       => ' ppb',
                 'ICON'         => 'Wind'
             ]);
         }
 
         // Radon ST / LT
-        if (@IPS_VariableExists($this->GetIDForIdent('RadonST'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('RadonST'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirRadonST', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirRadonST'), [
                 'SUFFIX'       => ' Bq/m³',
                 'ICON'         => 'Radiation'
             ]);
         }
-        if (@IPS_VariableExists($this->GetIDForIdent('RadonLT'))) {
-            IPS_SetVariableCustomPresentation($this->GetIDForIdent('RadonLT'), [
-                'PRESENTATION' => 1,
+        if (@IPS_GetObjectIDByIdent('AirRadonLT', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirRadonLT'), [
                 'SUFFIX'       => ' Bq/m³',
                 'ICON'         => 'Radiation'
             ]);
@@ -132,22 +124,22 @@ class AirthingsWavePlus extends IPSModuleStrict
                 
                 // Map ESPHome default topic names to variables
                 // Use @IPS_GetObjectIDByIdent instead of GetIDForIdent to avoid Exceptions in Strict Mode
-                if (strpos($topic, 'temperature') !== false && @IPS_GetObjectIDByIdent('Temperature', $this->InstanceID) !== false) {
-                    $this->SetValue('Temperature', $value);
-                } elseif (strpos($topic, 'humidity') !== false && @IPS_GetObjectIDByIdent('Humidity', $this->InstanceID) !== false) {
-                    $this->SetValue('Humidity', $value);
-                } elseif (strpos($topic, 'pressure') !== false && @IPS_GetObjectIDByIdent('Pressure', $this->InstanceID) !== false) {
-                    $this->SetValue('Pressure', $value);
-                } elseif (strpos($topic, 'battery') !== false && @IPS_GetObjectIDByIdent('Battery', $this->InstanceID) !== false) {
-                    $this->SetValue('Battery', $value);
-                } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('CO2', $this->InstanceID) !== false) {
-                    $this->SetValue('CO2', (int)$value);
-                } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @IPS_GetObjectIDByIdent('VOC', $this->InstanceID) !== false) {
-                    $this->SetValue('VOC', (int)$value);
-                } elseif (strpos($topic, 'radon_long_term') !== false && @IPS_GetObjectIDByIdent('RadonLT', $this->InstanceID) !== false) {
-                    $this->SetValue('RadonLT', (int)$value);
-                } elseif (strpos($topic, 'radon') !== false && @IPS_GetObjectIDByIdent('RadonST', $this->InstanceID) !== false) {
-                    $this->SetValue('RadonST', (int)$value);
+                if (strpos($topic, 'temperature') !== false && @IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
+                    $this->SetValue('AirTemp', $value);
+                } elseif (strpos($topic, 'humidity') !== false && @IPS_GetObjectIDByIdent('AirHum', $this->InstanceID) !== false) {
+                    $this->SetValue('AirHum', $value);
+                } elseif (strpos($topic, 'pressure') !== false && @IPS_GetObjectIDByIdent('AirPress', $this->InstanceID) !== false) {
+                    $this->SetValue('AirPress', $value);
+                } elseif (strpos($topic, 'battery') !== false && @IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
+                    $this->SetValue('AirBatt', $value);
+                } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('AirCO2', $this->InstanceID) !== false) {
+                    $this->SetValue('AirCO2', (int)$value);
+                } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @IPS_GetObjectIDByIdent('AirVOC', $this->InstanceID) !== false) {
+                    $this->SetValue('AirVOC', (int)$value);
+                } elseif (strpos($topic, 'radon_long_term') !== false && @IPS_GetObjectIDByIdent('AirRadonLT', $this->InstanceID) !== false) {
+                    $this->SetValue('AirRadonLT', (int)$value);
+                } elseif (strpos($topic, 'radon') !== false && @IPS_GetObjectIDByIdent('AirRadonST', $this->InstanceID) !== false) {
+                    $this->SetValue('AirRadonST', (int)$value);
                 }
             }
 
