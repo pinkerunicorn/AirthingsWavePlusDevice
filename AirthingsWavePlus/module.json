@@ -1,0 +1,11 @@
+{
+    "id": "{B3A63109-386C-4597-B74D-CC308E8B6DDB}",
+    "name": "Airthings Wave Plus",
+    "type": 3,
+    "vendor": "Airthings",
+    "aliases": ["Wave Plus"],
+    "parentRequirements": [],
+    "childRequirements": [],
+    "implemented": [],
+    "prefix": "AIRTHINGS"
+}
