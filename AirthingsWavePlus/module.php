@@ -19,6 +19,7 @@ class AirthingsWavePlus extends IPSModuleStrict
         $this->RegisterVariableFloat('Temperature', 'Temperatur', '', 10);
         $this->RegisterVariableFloat('Humidity', 'Luftfeuchtigkeit', '', 20);
         $this->RegisterVariableFloat('Pressure', 'Luftdruck', '', 30);
+        $this->RegisterVariableFloat('Battery', 'Batterie', '', 35);
         $this->RegisterVariableInteger('CO2', 'CO2', '', 40);
         $this->RegisterVariableInteger('VOC', 'VOC', '', 50);
         $this->RegisterVariableInteger('RadonST', 'Radon (Short Term)', '', 60);
@@ -64,6 +65,15 @@ class AirthingsWavePlus extends IPSModuleStrict
                 'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
                 'SUFFIX'       => ' hPa',
                 'ICON'         => 'Gauge'
+            ]);
+        }
+
+        // Batterie
+        if (@IPS_VariableExists($this->GetIDForIdent('Battery'))) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Battery'), [
+                'PRESENTATION' => VARIABLE_PRESENTATION_LABEL,
+                'SUFFIX'       => ' V', // ESPHome gives voltage by default
+                'ICON'         => 'Battery'
             ]);
         }
 
@@ -126,6 +136,8 @@ class AirthingsWavePlus extends IPSModuleStrict
                 $this->SetValue('Humidity', $value);
             } elseif (strpos($topic, 'pressure') !== false) {
                 $this->SetValue('Pressure', $value);
+            } elseif (strpos($topic, 'battery') !== false) {
+                $this->SetValue('Battery', $value);
             } elseif (strpos($topic, 'co2') !== false) {
                 $this->SetValue('CO2', (int)$value);
             } elseif (strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) {
