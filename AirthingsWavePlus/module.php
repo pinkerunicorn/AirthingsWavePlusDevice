@@ -11,9 +11,11 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         // Properties for MQTT
         $this->RegisterPropertyString('MQTTBaseTopic', 'airthings01');
+        $this->RegisterPropertyInteger('Timeout', 30); // 30 minutes default timeout
         $this->SetReceiveDataFilter('.*' . preg_quote($this->ReadPropertyString('MQTTBaseTopic')) . '.*');
 
         // Variables
+        $this->RegisterVariableBoolean('Online', 'Online');
         $this->RegisterVariableFloat('AirTemp', 'Temperatur');
         $this->RegisterVariableFloat('AirHum', 'Luftfeuchtigkeit');
         $this->RegisterVariableFloat('AirPress', 'Luftdruck');
@@ -22,6 +24,9 @@ class AirthingsWavePlus extends IPSModuleStrict
         $this->RegisterVariableInteger('AirVOC', 'VOC');
         $this->RegisterVariableInteger('AirRadonST', 'Radon (Short Term)');
         $this->RegisterVariableInteger('AirRadonLT', 'Radon (Long Term)');
+        
+        // Timer
+        $this->RegisterTimer('WatchdogTimer', 0, 'AIRTHINGS_WatchdogTriggered($_IPS[\'TARGET\']);');
     }
 
     public function ApplyChanges(): void
@@ -35,10 +40,39 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         // Apply Symcon 8 Custom Presentations (instead of Legacy Profiles)
         $this->UpdatePresentations();
+        
+        // Reset Watchdog Timer if enabled
+        $this->ResetWatchdog();
+    }
+    
+    public function WatchdogTriggered(): void
+    {
+        // Timer fired -> no data received for 'Timeout' minutes
+        $this->SetTimerInterval('WatchdogTimer', 0); // Stop timer until new data arrives
+        $this->SetValue('Online', false);
+        IPS_LogMessage('AirthingsWavePlus', 'Watchdog ausgelöst: Keine Daten seit ' . $this->ReadPropertyInteger('Timeout') . ' Minuten empfangen!');
+    }
+    
+    private function ResetWatchdog(): void
+    {
+        $timeout = $this->ReadPropertyInteger('Timeout');
+        if ($timeout > 0) {
+            $this->SetTimerInterval('WatchdogTimer', $timeout * 60 * 1000);
+        } else {
+            $this->SetTimerInterval('WatchdogTimer', 0);
+        }
     }
 
     private function UpdatePresentations(): void
     {
+        // Online Status
+        if (@IPS_GetObjectIDByIdent('Online', $this->InstanceID) !== false) {
+            IPS_SetVariableCustomPresentation($this->GetIDForIdent('Online'), [
+                'PRESENTATION' => VARIABLE_PRESENTATION_VALUE_PRESENTATION,
+                'ICON'         => 'Network'
+            ]);
+        }
+
         // Temperatur
         if (@IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
             IPS_SetVariableCustomPresentation($this->GetIDForIdent('AirTemp'), [
@@ -128,33 +162,58 @@ class AirthingsWavePlus extends IPSModuleStrict
             
             $base = $this->ReadPropertyString('MQTTBaseTopic');
 
-            IPS_LogMessage('AirthingsWavePlus', 'Received Topic: ' . $topic . ' | Payload: ' . $payloadStr);
+            // Set general device online status from ESPHome LWT if available
+            if ($topic === $base . '/status') {
+                $isOnline = (strtolower($payloadStr) === 'online');
+                $this->SetValue('Online', $isOnline);
+                if ($isOnline) {
+                    $this->ResetWatchdog();
+                } else {
+                    $this->SetTimerInterval('WatchdogTimer', 0);
+                }
+                return "OK";
+            }
 
             // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
             if (strpos($topic, $base) !== false) {
                 $value = floatval($payloadStr);
+                $updated = false;
                 
                 // Map ESPHome default topic names to variables
                 // Use @IPS_GetObjectIDByIdent instead of GetIDForIdent to avoid Exceptions in Strict Mode
                 if (strpos($topic, 'temp') !== false && @IPS_GetObjectIDByIdent('AirTemp', $this->InstanceID) !== false) {
                     $this->SetValue('AirTemp', $value);
+                    $updated = true;
                 } elseif (strpos($topic, 'hum') !== false && @IPS_GetObjectIDByIdent('AirHum', $this->InstanceID) !== false) {
                     $this->SetValue('AirHum', $value);
+                    $updated = true;
                 } elseif (strpos($topic, 'press') !== false && @IPS_GetObjectIDByIdent('AirPress', $this->InstanceID) !== false) {
                     $this->SetValue('AirPress', $value);
+                    $updated = true;
                 } elseif (strpos($topic, 'batt') !== false && @IPS_GetObjectIDByIdent('AirBatt', $this->InstanceID) !== false) {
                     $this->SetValue('AirBatt', $value);
+                    $updated = true;
                 } elseif (strpos($topic, 'co2') !== false && @IPS_GetObjectIDByIdent('AirCO2', $this->InstanceID) !== false) {
                     $this->SetValue('AirCO2', (int)$value);
+                    $updated = true;
                 } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @IPS_GetObjectIDByIdent('AirVOC', $this->InstanceID) !== false) {
                     $this->SetValue('AirVOC', (int)$value);
+                    $updated = true;
                 } elseif ((strpos($topic, 'radon_long_term') !== false || strpos($topic, 'radon_lt') !== false) && @IPS_GetObjectIDByIdent('AirRadonLT', $this->InstanceID) !== false) {
                     $this->SetValue('AirRadonLT', (int)$value);
+                    $updated = true;
                 } elseif (strpos($topic, 'radon') !== false && @IPS_GetObjectIDByIdent('AirRadonST', $this->InstanceID) !== false) {
                     // Check if it's not the long term to avoid double matching
                     if (strpos($topic, 'long') === false && strpos($topic, 'lt') === false) {
                         $this->SetValue('AirRadonST', (int)$value);
+                        $updated = true;
                     }
+                }
+                
+                // Reset Watchdog on any sensor update
+                if ($updated) {
+                    $this->SetValue('Online', true);
+                    $this->ResetWatchdog();
                 }
             }
 
