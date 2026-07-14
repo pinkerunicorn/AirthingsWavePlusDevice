@@ -3,9 +3,11 @@
     "name": "Airthings Wave Plus",
     "type": 3,
     "vendor": "Airthings",
+    "author": "Florian Graßinger",
     "aliases": ["Wave Plus"],
     "parentRequirements": [],
     "childRequirements": [],
     "implemented": [],
+    "url": "https://github.com/pinkerunicorn/",
     "prefix": "AIRTHINGS"
 }
