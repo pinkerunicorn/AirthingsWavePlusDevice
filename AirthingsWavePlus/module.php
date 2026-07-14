@@ -11,6 +11,7 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         // Properties for MQTT
         $this->RegisterPropertyString('MQTTBaseTopic', 'airthings01');
+        $this->SetReceiveDataFilter('.*' . preg_quote($this->ReadPropertyString('MQTTBaseTopic')) . '.*');
 
         // Variables
         $this->RegisterVariableFloat('Temperature', 'Temperatur');
@@ -129,21 +130,21 @@ class AirthingsWavePlus extends IPSModuleStrict
             $value = floatval($payload);
             
             // Map ESPHome default topic names to variables
-            if (strpos($topic, 'temperature') !== false) {
+            if (strpos($topic, 'temperature') !== false && @$this->GetIDForIdent('Temperature') !== false) {
                 $this->SetValue('Temperature', $value);
-            } elseif (strpos($topic, 'humidity') !== false) {
+            } elseif (strpos($topic, 'humidity') !== false && @$this->GetIDForIdent('Humidity') !== false) {
                 $this->SetValue('Humidity', $value);
-            } elseif (strpos($topic, 'pressure') !== false) {
+            } elseif (strpos($topic, 'pressure') !== false && @$this->GetIDForIdent('Pressure') !== false) {
                 $this->SetValue('Pressure', $value);
-            } elseif (strpos($topic, 'battery') !== false) {
+            } elseif (strpos($topic, 'battery') !== false && @$this->GetIDForIdent('Battery') !== false) {
                 $this->SetValue('Battery', $value);
-            } elseif (strpos($topic, 'co2') !== false) {
+            } elseif (strpos($topic, 'co2') !== false && @$this->GetIDForIdent('CO2') !== false) {
                 $this->SetValue('CO2', (int)$value);
-            } elseif (strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) {
+            } elseif ((strpos($topic, 'voc') !== false || strpos($topic, 'tvoc') !== false) && @$this->GetIDForIdent('VOC') !== false) {
                 $this->SetValue('VOC', (int)$value);
-            } elseif (strpos($topic, 'radon_long_term') !== false) {
+            } elseif (strpos($topic, 'radon_long_term') !== false && @$this->GetIDForIdent('RadonLT') !== false) {
                 $this->SetValue('RadonLT', (int)$value);
-            } elseif (strpos($topic, 'radon') !== false) {
+            } elseif (strpos($topic, 'radon') !== false && @$this->GetIDForIdent('RadonST') !== false) {
                 $this->SetValue('RadonST', (int)$value);
             }
         }
