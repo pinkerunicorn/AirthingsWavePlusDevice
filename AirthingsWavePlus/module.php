@@ -186,6 +186,12 @@ class AirthingsWavePlus extends IPSModuleStrict
             // Check if the topic belongs to us (e.g. "airthings01/sensor/waveplus_temperature/state")
             if (strpos($topic, $base) !== false) {
                 $value = floatval($payloadStr);
+                
+                // ESPHome sends 'nan' if a sensor is currently unavailable
+                if (!is_finite($value)) {
+                    return "OK"; // Ignore NaN / INF values
+                }
+
                 $updated = false;
                 
                 // Map ESPHome default topic names to variables
