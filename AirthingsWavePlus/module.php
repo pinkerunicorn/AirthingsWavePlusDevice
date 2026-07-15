@@ -16,15 +16,25 @@ class AirthingsWavePlus extends IPSModuleStrict
 
         // Variables
         $this->RegisterVariableBoolean('Online', 'Online');
+        IPS_SetIcon($this->GetIDForIdent('Online'), 'Network');
         $this->RegisterVariableBoolean('Alarm', 'Alarm');
+        IPS_SetIcon($this->GetIDForIdent('Alarm'), 'Warning');
         $this->RegisterVariableFloat('AirTemp', 'Temperatur');
+        IPS_SetIcon($this->GetIDForIdent('AirTemp'), 'Temperature');
         $this->RegisterVariableFloat('AirHum', 'Luftfeuchtigkeit');
+        IPS_SetIcon($this->GetIDForIdent('AirHum'), 'Drop');
         $this->RegisterVariableFloat('AirPress', 'Luftdruck');
+        IPS_SetIcon($this->GetIDForIdent('AirPress'), 'Cloud');
         $this->RegisterVariableFloat('AirBatt', 'Batterie');
+        IPS_SetIcon($this->GetIDForIdent('AirBatt'), 'Battery');
         $this->RegisterVariableInteger('AirCO2', 'CO2');
+        IPS_SetIcon($this->GetIDForIdent('AirCO2'), 'Cloud');
         $this->RegisterVariableInteger('AirVOC', 'VOC');
+        IPS_SetIcon($this->GetIDForIdent('AirVOC'), 'Cloud');
         $this->RegisterVariableInteger('AirRadonST', 'Radon (Short Term)');
+        IPS_SetIcon($this->GetIDForIdent('AirRadonST'), 'Cloud');
         $this->RegisterVariableInteger('AirRadonLT', 'Radon (Long Term)');
+        IPS_SetIcon($this->GetIDForIdent('AirRadonLT'), 'Cloud');
         
         // Timer
         $this->RegisterTimer('WatchdogTimer', 0, 'AIRTHINGS_WatchdogTriggered($_IPS[\'TARGET\']);');
